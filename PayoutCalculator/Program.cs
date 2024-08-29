@@ -26,6 +26,14 @@ public class League{
             Console.WriteLine(eventName.ID);
         }
     }
+    public void averagePrizePot(){
+        double prizeTotal = 0.0;
+        foreach (Tournament eventName in eventList){
+            prizeTotal += eventName.calcPrizePot(eventName.entrantCount);
+        }
+        double avgPrizePot = prizeTotal / eventList.Count();
+        Console.WriteLine(avgPrizePot);
+    }
 }
 class Tournament{
     public int ID;
@@ -44,13 +52,15 @@ class Tournament{
         Player[] podium = {firstPlace, secondPlace, thirdPlace};
     }
 
-    public void calcPrizePot(int entrantCount){
+    public double calcPrizePot(int entrantCount){
         int potBonus = (entrantCount > 5) ? 50 : 0; //if entrant count is 5 or more, add $50 to pot bonus
 
-        prizePot = (entrantCount * 5) + 50;
+        prizePot = (entrantCount * 5) + potBonus;
         firstPlacePayout = prizePot * .5;
         secondPlacePayout = prizePot * .3;
         thirdPlacePayout = prizePot * .2;
+
+        return prizePot;
     }
 }
 
