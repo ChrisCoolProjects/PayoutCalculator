@@ -6,12 +6,12 @@ using Microsoft.AspNetCore.Mvc.Formatters;
  * How many tournaments a player placed in
  * Input data for tournament, tournament is added to database and payout is automatically calculated and displayed
  * 
- *
- *
- *
  * 
- *
- *
+ * 
+ * 
+ * 
+ * 
+ * 
  * Final goal: "Is this player net positive after all their entrances?"
  * * * * * * * * * * * * * * * * * * * * * * * */
 public class League{
@@ -21,35 +21,52 @@ public class League{
         if(seasonOne == null)
         seasonOne = this;
     }
-    public void listEvents(){
+    public void ListEvents(){
         foreach (Tournament eventName in eventList){
             Console.WriteLine(eventName.ID);
         }
     }
-    public void averagePrizePot(){
+    public double AveragePrizePot(){
         double prizeTotal = 0.0;
         foreach (Tournament eventName in eventList){
             prizeTotal += eventName.calcPrizePot(eventName.entrantCount);
         }
         double avgPrizePot = prizeTotal / eventList.Count();
-        Console.WriteLine(avgPrizePot);
+        return avgPrizePot;
     }
+    public double AverageEntrants(){
+        int allEntrants = 0;
+        foreach(Tournament eventName in eventList){
+            allEntrants += eventName.entrantCount;
+        }
+        double avgEntrants = allEntrants / eventList.Count();
+        return avgEntrants;
+    }
+   // public void AddTournament(Tournament newEvent){
+    //    eventList.Add(newEvent);
+    //}
 }
-class Tournament{
+
+
+public class Tournament{
     public int ID;
-    Player[] podium;
+    public Player[] podium;
     public int entrantCount = 0;
     public double prizePot;
     public double firstPlacePayout;
     public double secondPlacePayout;
     public double thirdPlacePayout;
-
+    private bool attendanceMarked = false;
     public Tournament(){
-
+    //    League.seasonOne.AddTournament(this);
     }
     public Tournament(int tID, Player firstPlace, Player secondPlace, Player thirdPlace){
         ID = tID;
-        Player[] podium = {firstPlace, secondPlace, thirdPlace};
+        podium = [firstPlace, secondPlace, thirdPlace];
+        
+
+//        MarkAttendance(Tournament );
+//        League.seasonOne.AddTournament(this);
     }
 
     public double calcPrizePot(int entrantCount){
@@ -62,18 +79,32 @@ class Tournament{
 
         return prizePot;
     }
+
+    public void MarkAttendance(Tournament currentEvent){
+        if(!attendanceMarked){
+//          Tournament currentEvent = new Tournament();
+            for(int i = 0; i < 3; i++){ 
+                currentEvent.podium[i].Attendance.Add(currentEvent); // Works now!!
+                Console.WriteLine(podium[i].Name + " attended " + podium[i].Attendance.Count + " events.");
+            }
+            attendanceMarked = true;
+        }
+    }
 }
 
 
-class Player{
+public class Player{
 
     public string Name;
     public double Earnings = 0.0;
-
+    public List<Tournament> Attendance = [];
     public Player(string playerName){
         Name = playerName;
     }
+
 }
+
+
 
 class Program{
     public static void Main(String[] args){
@@ -82,6 +113,7 @@ class Program{
         Player player3 = new Player("GreyFaiden");
 
         Tournament QDB1 = new Tournament(1, player1, player2, player3);
+        //League.seasonOne.AddTournament(QDB1);
         QDB1.entrantCount = 30;
         QDB1.calcPrizePot(QDB1.entrantCount);
 
@@ -92,7 +124,8 @@ class Program{
         Console.WriteLine(player1.Name + "'s earned $" + player1.Earnings + " overall from events.");
         Console.WriteLine(player2.Name + "'s earned $" + player2.Earnings + " overall from events.");
         Console.WriteLine(player3.Name + "'s earned $" + player3.Earnings + " overall from events.");
-        
+        QDB1.MarkAttendance(QDB1);
+
     }
 }
 

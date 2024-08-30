@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("PayoutCalculator")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b9f1040855cf5410a96ddf94b8e6286a495714b7")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+7d70775a5b3a2fcb51b9c4a2dc15414b8c06f000")]
 [assembly: System.Reflection.AssemblyProductAttribute("PayoutCalculator")]
 [assembly: System.Reflection.AssemblyTitleAttribute("PayoutCalculator")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
