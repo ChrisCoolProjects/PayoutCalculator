@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc.Formatters;
+using Microsoft.AspNetCore.SignalR;
 /* * * * * * * * * * * * * * * * * * * * * * * *
  * Outputs of this program:
  * Entrant count and prize pool for a specific tournament
@@ -26,18 +27,18 @@ public class League{
             Console.WriteLine(eventName.ID);
         }
     }
-    public double AveragePrizePot(){
+    public double AveragePrizePot(){ //will be refactored
         double prizeTotal = 0.0;
         foreach (Tournament eventName in eventList){
-            prizeTotal += eventName.calcPrizePot(eventName.entrantCount);
+            prizeTotal += eventName.calcPrizePot(eventName.getEntrantCount());
         }
         double avgPrizePot = prizeTotal / eventList.Count();
         return avgPrizePot;
     }
-    public double AverageEntrants(){
+    public double AverageEntrants(){ //will be refactored
         int allEntrants = 0;
         foreach(Tournament eventName in eventList){
-            allEntrants += eventName.entrantCount;
+            allEntrants += eventName.getEntrantCount();
         }
         double avgEntrants = allEntrants / eventList.Count();
         return avgEntrants;
@@ -50,23 +51,22 @@ public class League{
 
 public class Tournament{
     public int ID;
-    public Player[] podium;
-    public int entrantCount = 0;
-    public double prizePot;
+    public Player[] podium = [];
+    protected int entrantCount {get; set;} = 0;
+    private double prizePot {get; set;}
     public double firstPlacePayout;
     public double secondPlacePayout;
     public double thirdPlacePayout;
     private bool attendanceMarked = false;
-    public Tournament(){
-    //    League.seasonOne.AddTournament(this);
+    private bool winningsAssigned = false;
+        public Tournament(){
     }
-    public Tournament(int tID, Player firstPlace, Player secondPlace, Player thirdPlace){
-        ID = tID;
-        podium = [firstPlace, secondPlace, thirdPlace];
-        
-
-//        MarkAttendance(Tournament );
-//        League.seasonOne.AddTournament(this);
+    public Tournament(int playerCount, Player firstPlace, Player secondPlace, Player thirdPlace){
+        entrantCount = playerCount;
+        calcPrizePot(entrantCount);
+        setPodium(firstPlace, secondPlace, thirdPlace);
+        MarkAttendance();
+        AssignWinnings();
     }
 
     public double calcPrizePot(int entrantCount){
@@ -79,16 +79,63 @@ public class Tournament{
 
         return prizePot;
     }
-
-    public void MarkAttendance(Tournament currentEvent){
+    public void setPodium(Player firstPlace, Player secondPlace, Player thirdPlace){
+        podium = [firstPlace, secondPlace, thirdPlace];
+    }
+    public void MarkAttendance(){
         if(!attendanceMarked){
 //          Tournament currentEvent = new Tournament();
             for(int i = 0; i < 3; i++){ 
-                currentEvent.podium[i].Attendance.Add(currentEvent); // Works now!!
-                Console.WriteLine(podium[i].Name + " attended " + podium[i].Attendance.Count + " events.");
+                podium[i].Attendance.Add(this); // Works now!!
             }
             attendanceMarked = true;
         }
+    }
+
+    public void AssignWinnings(){
+        if(prizePot != 0 && winningsAssigned == false){
+        podium[0].Earnings+=firstPlacePayout;
+        podium[1].Earnings+=secondPlacePayout;
+        podium[2].Earnings+=thirdPlacePayout;
+        }
+        winningsAssigned = true;
+    }
+
+    public int getEntrantCount(){
+        return entrantCount;
+    }
+
+    public void PromptForTournament(){
+        int escapeVar = 1;
+        while(escapeVar != 0){
+        Tournament newTournament = new Tournament();
+        double localPrizePot = 0;
+
+        string userFirstPlace, userSecondPlace, userThirdPlace = "";
+
+        Console.WriteLine("Enter the number of entrants for this tournament");
+        newTournament.entrantCount = Convert.ToInt32(Console.ReadLine());
+        localPrizePot = newTournament.calcPrizePot(newTournament.entrantCount);
+
+        Console.WriteLine("Who got first place?");
+        userFirstPlace = Console.ReadLine();
+
+        Console.WriteLine("Who got second place?");
+        userSecondPlace = Console.ReadLine();
+
+        Console.WriteLine("Who got third place?");
+        userThirdPlace = Console.ReadLine();
+
+        Console.WriteLine($"{userFirstPlace} won ${newTournament.firstPlacePayout}.");
+        Console.WriteLine($"{userSecondPlace} won ${newTournament.secondPlacePayout}.");
+        Console.WriteLine($"{userThirdPlace} won ${newTournament.thirdPlacePayout}.");
+        Console.WriteLine();
+
+        Console.WriteLine("Main Menu: \n 0: Exit \n Any other number: Run calculation again.");
+        escapeVar = Convert.ToInt32(Console.ReadLine());
+
+        }
+
     }
 }
 
@@ -102,29 +149,58 @@ public class Player{
         Name = playerName;
     }
 
+    public void CheckAttendance(){
+        Console.WriteLine($"{Name} has attended {Attendance.Count} event{(Attendance.Count == 1 ? "" : "s")}.");
+    }
+    public void CheckEarnings(){
+        Console.WriteLine(Name + " has earned $" + Earnings + " overall from events.");
+    }
+    
+    public void DisplayStats(){
+        CheckAttendance();
+        CheckEarnings();
+        Console.WriteLine();        
+    }
+
 }
 
+public class Roster{
+    protected List<Player> players = [];
 
+    public void AddPlayer(Player newPlayer){
+        if(!players.Contains(newPlayer)){
+            players.Add(newPlayer);
+        }
+    }
+
+    public void ListPlayers(){
+        foreach(Player currentPlayer in players){
+            Console.WriteLine($"{players.IndexOf(currentPlayer)+1}. {currentPlayer.Name}");//, (players.IndexOf(currentPlayer) + 1), currentPlayer.Name);
+        }
+    }
+}
 
 class Program{
     public static void Main(String[] args){
-        Player player1 = new Player("PapaPesto");
-        Player player2 = new Player("Silent");
-        Player player3 = new Player("GreyFaiden");
 
-        Tournament QDB1 = new Tournament(1, player1, player2, player3);
+        Roster currentRoster = new Roster();
+        Player player1 = new Player("PapaPesto"); currentRoster.AddPlayer(player1);
+        Player player2 = new Player("Silent"); currentRoster.AddPlayer(player2);
+        Player player3 = new Player("GreyFaiden"); currentRoster.AddPlayer(player3);
+        Player player4 = new Player("StoryTime"); currentRoster.AddPlayer(player4);
+        Player player5 = new Player("Knotts"); currentRoster.AddPlayer(player5);
+        
+
+        Tournament QDB1 = new Tournament(30, player1, player2, player3);
         //League.seasonOne.AddTournament(QDB1);
-        QDB1.entrantCount = 30;
-        QDB1.calcPrizePot(QDB1.entrantCount);
 
-        player1.Earnings += QDB1.firstPlacePayout;
-        player2.Earnings += QDB1.secondPlacePayout;
-        player3.Earnings += QDB1.thirdPlacePayout;
+        Tournament QDB2 = new Tournament(24, player5, player1, player4);
+        //League.seasonOne.AddTournament(QDB2);
+        //player1.DisplayStats();
+        //player5.DisplayStats();
 
-        Console.WriteLine(player1.Name + "'s earned $" + player1.Earnings + " overall from events.");
-        Console.WriteLine(player2.Name + "'s earned $" + player2.Earnings + " overall from events.");
-        Console.WriteLine(player3.Name + "'s earned $" + player3.Earnings + " overall from events.");
-        QDB1.MarkAttendance(QDB1);
+        //currentRoster.ListPlayers();
+        QDB2.PromptForTournament();
 
     }
 }
