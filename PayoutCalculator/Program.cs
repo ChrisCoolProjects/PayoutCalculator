@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.SignalR;
  * How many tournaments a player placed in
  * Input data for tournament, tournament is added to database and payout is automatically calculated and displayed
  * 
- * 
+ * Player Stats:
  * 
  * 
  * 
@@ -174,8 +174,9 @@ public class Roster{
     }
 
     public void ListPlayers(){
+        players = players.OrderBy(player=>-player.Earnings).ToList();
         foreach(Player currentPlayer in players){
-            Console.WriteLine($"{players.IndexOf(currentPlayer)+1}. {currentPlayer.Name}");//, (players.IndexOf(currentPlayer) + 1), currentPlayer.Name);
+            Console.WriteLine($"{players.IndexOf(currentPlayer)+1}. {currentPlayer.Name}: ${currentPlayer.Earnings}");//, (players.IndexOf(currentPlayer) + 1), currentPlayer.Name);
         }
     }
 }
@@ -199,8 +200,8 @@ class Program{
         //player1.DisplayStats();
         //player5.DisplayStats();
 
-        //currentRoster.ListPlayers();
-        QDB2.PromptForTournament();
+        currentRoster.ListPlayers();
+        //QDB2.PromptForTournament();
 
     }
 }
