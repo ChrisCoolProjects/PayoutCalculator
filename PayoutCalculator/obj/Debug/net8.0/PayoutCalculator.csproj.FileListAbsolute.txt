@@ -23,3 +23,4 @@
 /Users/christophersoremekun/Documents/CodingProjects/PayoutCalculator/PayoutCalculator/obj/Debug/net8.0/PayoutCalculator.pdb
 /Users/christophersoremekun/Documents/CodingProjects/PayoutCalculator/PayoutCalculator/obj/Debug/net8.0/PayoutCalculator.genruntimeconfig.cache
 /Users/christophersoremekun/Documents/CodingProjects/PayoutCalculator/PayoutCalculator/obj/Debug/net8.0/ref/PayoutCalculator.dll
+/Users/christophersoremekun/Documents/CodingProjects/PayoutCalculator/PayoutCalculator/obj/Debug/net8.0/PayoutCalculator.sourcelink.json
